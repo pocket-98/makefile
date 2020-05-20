@@ -10,3 +10,8 @@ other useful things:
  * `test/test.hpp` macros for asserting if vars are equal
  * `test_fn/test_file.py` runs a command and gets stdout/stderr/retcode
  * `test_fn/main.py` pretty print exp/actual diff with colors for each test
+
+screens:
+![test](screen_test.png)
+![cov](screen_cov.png)
+![vars](screen_vars.png)
