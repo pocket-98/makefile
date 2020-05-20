@@ -40,7 +40,7 @@ TARGET_COV      = a.out-cov
 GCOV            = gcov
 COVOPTS         = -fprofile-arcs -ftest-coverage
 GCOVOPTS        = -b -n
-GCOVPRNT        = grep -A 4 "\.cpp" | grep -v "/usr/include" \
+GCOVPRNT        = grep -EA 4 "\.c|\.cpp" | grep -v "/usr/include" \
                 | sed -E '/^No.*/d' | sed -E 's/(^Lin|^Bra|^Tak|^Cal)/    \1/'
 
 COV_GCDA        = $(patsubst %.cpp,$(BIN)%.gcda,$(filter %.cpp,$(MAIN))) \
