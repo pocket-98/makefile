@@ -37,11 +37,9 @@ TEST_OBJ        = $(patsubst %.cpp,$(BIN)%.o, $(filter %.cpp,$(TEST_SOURCES))) \
                 $(patsubst %.c,$(BIN)%.o, $(filter %.c,$(TEST_SOURCES)))
 
 TARGET_COV      = a.out-cov
-GCOV            = gcov
-COVOPTS         = -fprofile-arcs -ftest-coverage
-GCOVOPTS        = -b -n
-GCOVPRNT        = grep -EA 4 "\.c|\.cpp" | grep -v "/usr/include" \
-                | sed -E '/^No.*/d' | sed -E 's/(^Lin|^Bra|^Tak|^Cal)/    \1/'
+COVOPTS         = -fprofile-arcs -ftest-coverage --coverage -fno-inline \
+                  -O0 -fno-inline-small-functions -fno-default-inline
+GCOV            = gcov -rpbj
 
 COV_GCDA        = $(patsubst %.cpp,$(BIN)%.gcda,$(filter %.cpp,$(MAIN))) \
                 $(patsubst %.c,$(BIN)%.gcda,$(filter %.c,$(MAIN))) \
@@ -61,7 +59,7 @@ COV_GCNO        = $(patsubst %.cpp,$(BIN)%.gcno,$(filter %.cpp,$(MAIN))) \
                 $(patsubst %.cpp,$(BIN)%.gcno,$(filter %.cpp,$(TEST_SOURCES))) \
                 $(patsubst %.c,$(BIN)%.gcno,$(filter %.c,$(TEST_SOURCES)))
 
-.PHONY: all test cov
+.PHONY: all test cov covr vars
 
 all: $(TARGET)
 
@@ -116,7 +114,14 @@ cov: $(TARGET_COV)
 	@echo -e "\nfunctional testing:"
 	$(PYTHON) $(TEST_FUNC_PY)
 	@echo -e "\nchecking coverage '$(TARGET_COV)':"
-	@$(GCOV) $(GCOVOPTS) $(COV_GCDA) | $(GCOVPRNT)
+	@$(GCOV) -n $(COV_GCDA) | awk '/^File/ {f=0} /^File.+\.cpp|^File.+\.c/ \
+	{f=1; t="\n"} (f==1) {if (!($$0 ~ /^No /)) {print t $$0} t="	"} '
+
+# make coverage files for each source
+covr: cov
+	@$(GCOV) $(COV_GCDA) | grep -E "^Creating" | cut -d"'" -f2 \
+	| awk -F"#" 'BEGIN{print "set -x"} {o="$(BIN)" $$0; gsub("#","/",o); d=o; \
+	gsub($$NF,"",d); printf("mkdir -p %s; mv %s %s\n", d, $$0, o)}' | bash
 
 # remove objects and executable
 clean:
@@ -127,6 +132,11 @@ clean:
 
 # print variables
 vars:
+	@echo "CC                       $(CC)"
+	@echo "CXX                      $(CXX)"
+	@echo "CCOPTS                   $(CCOPTS)"
+	@echo "CXXOPTS                  $(CXXOPTS)"
+	@echo
 	@echo "TARGET                   $(TARGET)"
 	@echo "MAIN                     $(MAIN)"
 	@echo "SOURCES                  $(SOURCES)"
@@ -140,4 +150,7 @@ vars:
 	@echo "TEST_HEADERS             $(TEST_HEADERS)"
 	@echo
 	@echo "TARGET_COV               $(TARGET_COV)"
+	@echo "COVOPTS                  $(COVOPTS)"
+	@echo "GCOV                     $(GCOV)"
+	@echo "COV_GCDA                 $(COV_GCDA)"
 	@echo

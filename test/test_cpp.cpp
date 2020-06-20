@@ -8,9 +8,9 @@
 #include <cstring>
 
 int test_cpp::test_cout() {
-    const char* str = "thing";
+    const char* str = "";
     cpp::coutChars(str);
-    //testequal("incorrect print", std::string("thing"), std::string(str))
+    //testequal("incorrect print", std::string(""), std::string(str))
     return EXIT_SUCCESS;
 }
 
