@@ -41,7 +41,7 @@
     if (fabs((a)-(b)) < _TEST_EPS) { \
         std::cerr << indent << "\033[0;31m" << "error:" << "\033[0m" \
                   << __LINE__ << ": " << (str) << ": expected: " << a \
-                  << " actual: " << b << std::endl; \
+                  << "  !=  " << b << std::endl; \
         return EXIT_FAILURE; \
     } \
 }
@@ -65,7 +65,7 @@
     if ((a) == (b)) { \
         std::cerr << indent << "\033[0;31m" << "error:" << "\033[0m" \
                   << __LINE__ << ": " << (str) << ": expected: " << a \
-                  << " actual: " << b << std::endl; \
+                  << "  !=  " << b << std::endl; \
         return EXIT_FAILURE; \
     } \
 }
